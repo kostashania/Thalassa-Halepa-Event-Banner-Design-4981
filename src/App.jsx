@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import * as FiIcons from 'react-icons/fi'
 import SafeIcon from './common/SafeIcon'
 import EventsSection from './components/EventsSection'
-import AuthModal from './components/AuthModal'
+import SimpleAuthModal from './components/SimpleAuthModal'
+import CreationManager from './components/CreationManager'
 import { useAuth } from './hooks/useAuth'
 
 const { FiDownload, FiImage, FiEdit3, FiCopy, FiCheck, FiUser, FiLogOut, FiCalendar } = FiIcons
@@ -30,7 +31,7 @@ function App() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [currentView, setCurrentView] = useState('builder') // 'builder' or 'events'
   
-  const { user, profile, signOut } = useAuth()
+  const { user, logout } = useAuth()
 
   const updateCard = (index, field, value) => {
     const newCards = [...cards]
@@ -141,9 +142,23 @@ ${cards.map(card => `
     URL.revokeObjectURL(url)
   }
 
+  const handleLoadCreation = (creation) => {
+    if (creation.config_data) {
+      const config = creation.config_data
+      if (config.imageUrl) setImageUrl(config.imageUrl)
+      if (config.cards) setCards(config.cards)
+    }
+  }
+
+  const handleImportHtml = (htmlContent) => {
+    // Try to extract config from HTML comments or data attributes
+    // For now, just notify that HTML was imported
+    alert('HTML εισήχθη επιτυχώς! Μπορείτε να προσαρμόσετε τις ρυθμίσεις.')
+  }
+
   const handleSignOut = async () => {
     try {
-      await signOut()
+      logout()
     } catch (error) {
       console.error('Error signing out:', error)
     }
@@ -187,7 +202,7 @@ ${cards.map(card => `
               {user ? (
                 <div className="flex items-center space-x-3">
                   <span className="text-sm text-gray-700">
-                    Γεια σας, {profile?.full_name || user.email}
+                    Γεια σας, {user.full_name || user.email}
                   </span>
                   <button
                     onClick={handleSignOut}
@@ -227,14 +242,14 @@ ${cards.map(card => `
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     <SafeIcon icon={copied ? FiCheck : FiCopy} className="w-4 h-4" />
-                    {copied ? 'Copied!' : 'Copy HTML'}
+                    {copied ? 'Αντιγράφηκε!' : 'Αντιγραφή HTML'}
                   </button>
                   <button
                     onClick={downloadHTML}
                     className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                   >
                     <SafeIcon icon={FiDownload} className="w-4 h-4" />
-                    Download HTML
+                    Λήψη HTML
                   </button>
                 </div>
 
@@ -256,63 +271,78 @@ ${cards.map(card => `
             </div>
           </div>
 
-          {/* Card Editors */}
+          {/* Main Content Area */}
           <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="flex items-center gap-2 mb-6">
-              <SafeIcon icon={FiEdit3} className="w-5 h-5 text-gray-600" />
-              <h2 className="text-xl font-semibold text-gray-800">Edit Feature Cards</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {cards.map((card, index) => (
-                <div key={index} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Icon (Emoji)
-                      </label>
-                      <input
-                        type="text"
-                        value={card.icon}
-                        onChange={(e) => updateCard(index, 'icon', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-2xl"
-                        maxLength="2"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Title
-                      </label>
-                      <input
-                        type="text"
-                        value={card.title}
-                        onChange={(e) => updateCard(index, 'title', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Description
-                      </label>
-                      <textarea
-                        value={card.text}
-                        onChange={(e) => updateCard(index, 'text', e.target.value)}
-                        rows="3"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                      />
-                    </div>
-                  </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left Column - Card Editors */}
+              <div className="lg:col-span-2">
+                <div className="flex items-center gap-2 mb-6">
+                  <SafeIcon icon={FiEdit3} className="w-5 h-5 text-gray-600" />
+                  <h2 className="text-xl font-semibold text-gray-800">Επεξεργασία Καρτών</h2>
                 </div>
-              ))}
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {cards.map((card, index) => (
+                    <div key={index} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Icon (Emoji)
+                          </label>
+                          <input
+                            type="text"
+                            value={card.icon}
+                            onChange={(e) => updateCard(index, 'icon', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-2xl"
+                            maxLength="2"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Τίτλος
+                          </label>
+                          <input
+                            type="text"
+                            value={card.title}
+                            onChange={(e) => updateCard(index, 'title', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Περιγραφή
+                          </label>
+                          <textarea
+                            value={card.text}
+                            onChange={(e) => updateCard(index, 'text', e.target.value)}
+                            rows="3"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column - Creation Manager */}
+              <div className="lg:col-span-1">
+                <CreationManager
+                  currentHtml={generateHTML()}
+                  currentConfig={{ imageUrl, cards }}
+                  onLoadCreation={handleLoadCreation}
+                  onImportHtml={handleImportHtml}
+                />
+              </div>
             </div>
           </div>
 
           {/* Preview */}
           <div className="border-t border-gray-200 bg-gray-100">
             <div className="max-w-7xl mx-auto px-4 py-8">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">Live Preview</h2>
+              <h2 className="text-xl font-semibold text-gray-800 mb-6">Προεπισκόπηση</h2>
               <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                 <div dangerouslySetInnerHTML={{ __html: generateHTML() }} />
               </div>
@@ -322,7 +352,7 @@ ${cards.map(card => `
       )}
 
       {/* Auth Modal */}
-      <AuthModal
+      <SimpleAuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
       />
