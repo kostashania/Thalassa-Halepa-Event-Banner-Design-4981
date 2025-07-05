@@ -119,14 +119,14 @@ const TemplateBuilder = () => {
         
         <!-- Image -->
         <div style="position: relative; border-radius: 15px; overflow: hidden; box-shadow: 0 15px 35px rgba(27,73,101,0.2); transition: transform 0.3s ease;">
-          <img src="${config.sectionImage}" alt="Event Image" style="width: 100%; height: 400px; object-fit: cover; display: block; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+          <img src="${config.sectionImage}" alt="Event Image" style="width: 100%; height: 400px; object-fit: cover; display: block; transition: transform 0.3s ease;">
         </div>
       </div>
       
       <!-- Feature Cards Grid -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px;">
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 40px; justify-items: center;">
         ${config.cards.map(card => `
-          <div style="background: white; padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 8px 25px rgba(27,73,101,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease; border-top: 4px solid #1E7F9D;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 40px rgba(27,73,101,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(27,73,101,0.08)'">
+          <div style="background: white; padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 8px 25px rgba(27,73,101,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease; border-top: 4px solid #1E7F9D; width: 100%; max-width: 350px;">
             
             <!-- Icon -->
             <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #E57F84, #E6D5B8); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
@@ -246,11 +246,6 @@ const TemplateBuilder = () => {
   }
 }
 
-/* Hover Effects */
-.wp-custom-template-wrapper .wp-events-intro > div > div:first-child > div:last-child:hover {
-  transform: translateY(-5px) !important;
-}
-
 /* Force styles over WordPress theme */
 .wp-custom-template-wrapper * {
   box-sizing: border-box !important;
@@ -267,65 +262,48 @@ const TemplateBuilder = () => {
   max-width: 100% !important;
   height: auto !important;
 }
-</style>
 
-<!-- Script for additional interactivity -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Add smooth scrolling and enhanced interactions
-  const cards = document.querySelectorAll('.wp-custom-template-wrapper [style*="box-shadow"]');
-  
-  cards.forEach(card => {
-    if (card.style.padding && card.style.padding.includes('30px')) {
-      card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-5px)';
-        this.style.boxShadow = '0 15px 40px rgba(27,73,101,0.15)';
-        this.style.transition = 'all 0.3s ease';
-      });
-      
-      card.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 8px 25px rgba(27,73,101,0.08)';
-      });
-    }
-  });
-  
-  // Image hover effects
-  const images = document.querySelectorAll('.wp-custom-template-wrapper img');
-  images.forEach(img => {
-    img.addEventListener('mouseenter', function() {
-      this.style.transform = 'scale(1.05)';
-      this.style.transition = 'transform 0.3s ease';
-    });
-    
-    img.addEventListener('mouseleave', function() {
-      this.style.transform = 'scale(1)';
-    });
-  });
-});
-</script>
+/* Hover effects */
+.wp-custom-template-wrapper [style*="box-shadow"]:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 15px 40px rgba(27,73,101,0.15) !important;
+}
+
+.wp-custom-template-wrapper img:hover {
+  transform: scale(1.05) !important;
+}
+</style>
 
 <!-- End WordPress Compatible Template -->`
   }
 
   const handleSave = () => {
-    const templates = JSON.parse(localStorage.getItem(`templates_${user.id}`) || '[]')
-    const updatedTemplateData = {
-      ...templateData,
-      html: generateHTML(),
-      updatedAt: new Date().toISOString(),
-      createdAt: templateData.createdAt || new Date().toISOString()
+    try {
+      const templates = JSON.parse(localStorage.getItem(`templates_${user.id}`) || '[]')
+      const updatedTemplateData = {
+        ...templateData,
+        html: generateHTML(),
+        updatedAt: new Date().toISOString(),
+        createdAt: templateData.createdAt || new Date().toISOString()
+      }
+      
+      const existingIndex = templates.findIndex(t => t.id === templateData.id)
+      if (existingIndex >= 0) {
+        templates[existingIndex] = updatedTemplateData
+      } else {
+        templates.push(updatedTemplateData)
+      }
+      
+      localStorage.setItem(`templates_${user.id}`, JSON.stringify(templates))
+      
+      // Update current template data to reflect saved state
+      setTemplateData(updatedTemplateData)
+      
+      alert('Template saved successfully!')
+    } catch (error) {
+      console.error('Save error:', error)
+      alert('Error saving template. Please try again.')
     }
-    
-    const existingIndex = templates.findIndex(t => t.id === templateData.id)
-    if (existingIndex >= 0) {
-      templates[existingIndex] = updatedTemplateData
-    } else {
-      templates.push(updatedTemplateData)
-    }
-    
-    localStorage.setItem(`templates_${user.id}`, JSON.stringify(templates))
-    alert('Template saved successfully!')
   }
 
   const handleCopyHTML = () => {
