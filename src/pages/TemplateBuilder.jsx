@@ -73,308 +73,239 @@ const TemplateBuilder = () => {
   const generateHTML = () => {
     const { config } = templateData
     
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${templateData.name}</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Georgia', serif;
-            line-height: 1.6;
-            background-color: ${config.sectionBackgroundColor};
-        }
-        
-        .events-hero {
-            background: linear-gradient(135deg, ${config.heroGradientFrom} 0%, ${config.heroGradientTo} 100%);
-            position: relative;
-            overflow: hidden;
-            padding: 80px 0;
-            color: ${config.heroTextColor};
-        }
-        
-        .events-hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('${config.heroBackgroundImage}') center/cover;
-            opacity: 0.15;
-            z-index: 1;
-        }
-        
-        .events-hero::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 100px;
-            background: linear-gradient(to top, ${config.sectionBackgroundColor}, transparent);
-            z-index: 2;
-        }
-        
-        .hero-content {
-            position: relative;
-            z-index: 3;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            text-align: center;
-        }
-        
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 300;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            letter-spacing: 2px;
-        }
-        
-        .hero-subtitle {
-            font-size: 1.4rem;
-            margin-bottom: 40px;
-            color: #E6D5B8;
-            font-style: italic;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
-        
-        .events-intro {
-            background-color: ${config.sectionBackgroundColor};
-            padding: 60px 0;
-            position: relative;
-        }
-        
-        .intro-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        .intro-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-            margin-bottom: 60px;
-        }
-        
-        .intro-text {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(27,73,101,0.1);
-            border-left: 5px solid #E57F84;
-            position: relative;
-        }
-        
-        .intro-text h2 {
-            color: #1B4965;
-            font-size: 2.2rem;
-            margin-bottom: 20px;
-            font-weight: 400;
-        }
-        
-        .intro-text p {
-            color: #333;
-            font-size: 1.1rem;
-            line-height: 1.8;
-            margin-bottom: 15px;
-        }
-        
-        .intro-image {
-            position: relative;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(27,73,101,0.2);
-            transition: transform 0.3s ease;
-        }
-        
-        .intro-image:hover {
-            transform: translateY(-5px);
-        }
-        
-        .intro-image img {
-            width: 100%;
-            height: 400px;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-        
-        .intro-image:hover img {
-            transform: scale(1.05);
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-        
-        .feature-card {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(27,73,101,0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border-top: 4px solid #1E7F9D;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(27,73,101,0.15);
-        }
-        
-        .feature-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #E57F84, #E6D5B8);
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-        }
-        
-        .feature-card h3 {
-            color: #1B4965;
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-        
-        .feature-card p {
-            color: #666;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-        
-        .cta-section {
-            background: linear-gradient(135deg, ${config.ctaGradientFrom}, ${config.ctaGradientTo});
-            padding: 50px 0;
-            text-align: center;
-            margin-top: 40px;
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .cta-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('${config.ctaBackgroundImage}') center/cover;
-            opacity: 0.05;
-            z-index: 1;
-        }
-        
-        .cta-content {
-            position: relative;
-            z-index: 2;
-        }
-        
-        .cta-section h2 {
-            color: #1B4965;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            font-weight: 300;
-        }
-        
-        .cta-section p {
-            color: #1B4965;
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.5rem;
-            }
-            
-            .hero-subtitle {
-                font-size: 1.1rem;
-            }
-            
-            .intro-grid {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .intro-text {
-                padding: 25px;
-            }
-            
-            .intro-text h2 {
-                font-size: 1.8rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <section class="events-hero">
-        <div class="hero-content">
-            <h1 class="hero-title">${config.heroTitle}</h1>
-            <p class="hero-subtitle">${config.heroSubtitle}</p>
-        </div>
-    </section>
+    // Generate WordPress-compatible HTML with inline styles and specific selectors
+    return `<!-- WordPress Compatible Template - ${templateData.name} -->
+<div class="wp-custom-template-wrapper" style="margin: 0; padding: 0; box-sizing: border-box; font-family: Georgia, serif; line-height: 1.6; background-color: ${config.sectionBackgroundColor}; overflow-x: hidden;">
+  
+  <!-- Hero Section -->
+  <div class="wp-events-hero" style="background: linear-gradient(135deg, ${config.heroGradientFrom} 0%, ${config.heroGradientTo} 100%); position: relative; overflow: hidden; padding: 80px 20px; color: ${config.heroTextColor}; text-align: center; min-height: 400px; display: flex; align-items: center; justify-content: center;">
+    
+    <!-- Background Image Overlay -->
+    <div style="content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('${config.heroBackgroundImage}') center/cover; opacity: 0.15; z-index: 1;"></div>
+    
+    <!-- Bottom Gradient -->
+    <div style="content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 100px; background: linear-gradient(to top, ${config.sectionBackgroundColor}, transparent); z-index: 2;"></div>
+    
+    <!-- Hero Content -->
+    <div style="position: relative; z-index: 3; max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+      <h1 style="font-size: 3.5rem; font-weight: 300; margin: 0 0 20px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); letter-spacing: 2px; color: ${config.heroTextColor} !important; line-height: 1.2;">
+        ${config.heroTitle}
+      </h1>
+      <p style="font-size: 1.4rem; margin: 0 0 40px 0; color: #E6D5B8 !important; font-style: italic; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); line-height: 1.4; max-width: 800px; margin-left: auto; margin-right: auto;">
+        ${config.heroSubtitle}
+      </p>
+    </div>
+  </div>
 
-    <section class="events-intro">
-        <div class="intro-container">
-            <div class="intro-grid">
-                <div class="intro-text">
-                    <h2>${config.sectionTitle}</h2>
-                    <p>${config.sectionText1}</p>
-                    <p>${config.sectionText2}</p>
-                </div>
-                <div class="intro-image">
-                    <img src="${config.sectionImage}" alt="Event Image">
-                </div>
-            </div>
-            
-            <div class="features-grid">
-                ${config.cards.map(card => `
-                    <div class="feature-card">
-                        <div class="feature-icon">${card.icon}</div>
-                        <h3>${card.title}</h3>
-                        <p>${card.text}</p>
-                    </div>
-                `).join('')}
-            </div>
-            
-            <div class="cta-section">
-                <div class="cta-content">
-                    <h2>${config.ctaTitle}</h2>
-                    <p>${config.ctaText}</p>
-                </div>
-            </div>
+  <!-- Main Content Section -->
+  <div class="wp-events-intro" style="background-color: ${config.sectionBackgroundColor}; padding: 60px 20px; position: relative;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+      
+      <!-- Intro Grid -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-bottom: 60px;">
+        
+        <!-- Text Content -->
+        <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(27,73,101,0.1); border-left: 5px solid #E57F84; position: relative;">
+          <h2 style="color: #1B4965 !important; font-size: 2.2rem; margin: 0 0 20px 0; font-weight: 400; line-height: 1.3;">
+            ${config.sectionTitle}
+          </h2>
+          <p style="color: #333 !important; font-size: 1.1rem; line-height: 1.8; margin: 0 0 15px 0;">
+            ${config.sectionText1}
+          </p>
+          <p style="color: #333 !important; font-size: 1.1rem; line-height: 1.8; margin: 0;">
+            ${config.sectionText2}
+          </p>
         </div>
-    </section>
-</body>
-</html>`
+        
+        <!-- Image -->
+        <div style="position: relative; border-radius: 15px; overflow: hidden; box-shadow: 0 15px 35px rgba(27,73,101,0.2); transition: transform 0.3s ease;">
+          <img src="${config.sectionImage}" alt="Event Image" style="width: 100%; height: 400px; object-fit: cover; display: block; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+      </div>
+      
+      <!-- Feature Cards Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px;">
+        ${config.cards.map(card => `
+          <div style="background: white; padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 8px 25px rgba(27,73,101,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease; border-top: 4px solid #1E7F9D;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 40px rgba(27,73,101,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(27,73,101,0.08)'">
+            
+            <!-- Icon -->
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #E57F84, #E6D5B8); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
+              ${card.icon}
+            </div>
+            
+            <!-- Title -->
+            <h3 style="color: #1B4965 !important; font-size: 1.3rem; margin: 0 0 15px 0; font-weight: 500; line-height: 1.3;">
+              ${card.title}
+            </h3>
+            
+            <!-- Description -->
+            <p style="color: #666 !important; font-size: 0.95rem; line-height: 1.6; margin: 0;">
+              ${card.text}
+            </p>
+          </div>
+        `).join('')}
+      </div>
+      
+      <!-- CTA Section -->
+      <div style="background: linear-gradient(135deg, ${config.ctaGradientFrom}, ${config.ctaGradientTo}); padding: 50px 30px; text-align: center; margin-top: 40px; border-radius: 20px; position: relative; overflow: hidden;">
+        
+        <!-- Background Image -->
+        <div style="content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('${config.ctaBackgroundImage}') center/cover; opacity: 0.05; z-index: 1;"></div>
+        
+        <!-- CTA Content -->
+        <div style="position: relative; z-index: 2;">
+          <h2 style="color: #1B4965 !important; font-size: 2.5rem; margin: 0 0 20px 0; font-weight: 300; line-height: 1.2;">
+            ${config.ctaTitle}
+          </h2>
+          <p style="color: #1B4965 !important; font-size: 1.2rem; margin: 0 auto 30px auto; max-width: 600px; line-height: 1.5;">
+            ${config.ctaText}
+          </p>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- Responsive Styles -->
+<style>
+@media (max-width: 768px) {
+  .wp-custom-template-wrapper .wp-events-hero h1 {
+    font-size: 2.5rem !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-hero p {
+    font-size: 1.1rem !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro > div > div:first-child {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro > div > div:first-child > div:first-child {
+    padding: 25px !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro > div > div:first-child > div:first-child h2 {
+    font-size: 1.8rem !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro > div > div:nth-child(2) {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro > div > div:last-child h2 {
+    font-size: 2rem !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro > div > div:last-child p {
+    font-size: 1.1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .wp-custom-template-wrapper .wp-events-hero {
+    padding: 60px 15px !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-hero h1 {
+    font-size: 2rem !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-hero p {
+    font-size: 1rem !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro {
+    padding: 40px 15px !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro > div > div:first-child > div:first-child {
+    padding: 20px !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro > div > div:first-child > div:first-child h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro > div > div:first-child > div:first-child p {
+    font-size: 1rem !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro > div > div:nth-child(2) > div {
+    padding: 20px !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro > div > div:last-child {
+    padding: 30px 20px !important;
+  }
+  
+  .wp-custom-template-wrapper .wp-events-intro > div > div:last-child h2 {
+    font-size: 1.8rem !important;
+  }
+}
+
+/* Hover Effects */
+.wp-custom-template-wrapper .wp-events-intro > div > div:first-child > div:last-child:hover {
+  transform: translateY(-5px) !important;
+}
+
+/* Force styles over WordPress theme */
+.wp-custom-template-wrapper * {
+  box-sizing: border-box !important;
+}
+
+.wp-custom-template-wrapper h1, 
+.wp-custom-template-wrapper h2, 
+.wp-custom-template-wrapper h3, 
+.wp-custom-template-wrapper p {
+  margin-top: 0 !important;
+}
+
+.wp-custom-template-wrapper img {
+  max-width: 100% !important;
+  height: auto !important;
+}
+</style>
+
+<!-- Script for additional interactivity -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Add smooth scrolling and enhanced interactions
+  const cards = document.querySelectorAll('.wp-custom-template-wrapper [style*="box-shadow"]');
+  
+  cards.forEach(card => {
+    if (card.style.padding && card.style.padding.includes('30px')) {
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px)';
+        this.style.boxShadow = '0 15px 40px rgba(27,73,101,0.15)';
+        this.style.transition = 'all 0.3s ease';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 8px 25px rgba(27,73,101,0.08)';
+      });
+    }
+  });
+  
+  // Image hover effects
+  const images = document.querySelectorAll('.wp-custom-template-wrapper img');
+  images.forEach(img => {
+    img.addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.05)';
+      this.style.transition = 'transform 0.3s ease';
+    });
+    
+    img.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1)';
+    });
+  });
+});
+</script>
+
+<!-- End WordPress Compatible Template -->`
   }
 
   const handleSave = () => {
@@ -482,7 +413,7 @@ const TemplateBuilder = () => {
                 className="flex items-center space-x-1 px-3 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors"
               >
                 <FiCopy className="w-4 h-4" />
-                <span>{copied ? 'Copied!' : 'Copy HTML'}</span>
+                <span>{copied ? 'Copied!' : 'Copy WordPress HTML'}</span>
               </button>
               <button
                 onClick={handleDownloadHTML}
@@ -732,7 +663,7 @@ const TemplateBuilder = () => {
             <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="bg-gray-100 px-4 py-2 border-b">
-                  <h3 className="font-medium text-gray-700">Live Preview</h3>
+                  <h3 className="font-medium text-gray-700">WordPress Preview</h3>
                 </div>
                 <div className="p-4">
                   <div 
@@ -742,7 +673,7 @@ const TemplateBuilder = () => {
                     <iframe
                       srcDoc={generateHTML()}
                       className="w-full h-full"
-                      title="Template Preview"
+                      title="WordPress Template Preview"
                     />
                   </div>
                 </div>
