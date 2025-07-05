@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 import LoginPage from './pages/LoginPage'
 import Dashboard from './pages/Dashboard'
 import TemplateBuilder from './pages/TemplateBuilder'
-import { AuthProvider, useAuth } from './contexts/AuthContext'
 
 function AppRoutes() {
   const { user, loading } = useAuth()
@@ -23,19 +23,19 @@ function AppRoutes() {
     <Routes>
       <Route 
         path="/login" 
-        element={user ? <Navigate to="/dashboard" /> : <LoginPage />} 
+        element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} 
       />
       <Route 
         path="/dashboard" 
-        element={user ? <Dashboard /> : <Navigate to="/login" />} 
+        element={user ? <Dashboard /> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/builder/:templateId?" 
-        element={user ? <TemplateBuilder /> : <Navigate to="/login" />} 
+        element={user ? <TemplateBuilder /> : <Navigate to="/login" replace />} 
       />
       <Route 
         path="/" 
-        element={<Navigate to={user ? "/dashboard" : "/login"} />} 
+        element={<Navigate to={user ? "/dashboard" : "/login"} replace />} 
       />
     </Routes>
   )
