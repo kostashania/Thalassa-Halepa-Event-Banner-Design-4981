@@ -1,14 +1,21 @@
 import { useState, useEffect } from 'react'
 import { creationService } from '../services/creationService'
+import { useAuth } from './useAuth'
 
 export const useCreations = () => {
   const [creations, setCreations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const { user } = useAuth()
 
   useEffect(() => {
-    loadCreations()
-  }, [])
+    if (user) {
+      loadCreations()
+    } else {
+      setCreations([])
+      setLoading(false)
+    }
+  }, [user])
 
   const loadCreations = async () => {
     try {
@@ -17,6 +24,7 @@ export const useCreations = () => {
       const data = await creationService.getUserCreations()
       setCreations(data)
     } catch (err) {
+      console.error('Load creations error:', err)
       setError(err.message)
     } finally {
       setLoading(false)
@@ -29,6 +37,7 @@ export const useCreations = () => {
       setCreations(prev => [newCreation, ...prev])
       return newCreation
     } catch (err) {
+      console.error('Save creation error:', err)
       setError(err.message)
       throw err
     }
@@ -40,6 +49,7 @@ export const useCreations = () => {
       setCreations(prev => prev.map(c => c.id === id ? updatedCreation : c))
       return updatedCreation
     } catch (err) {
+      console.error('Update creation error:', err)
       setError(err.message)
       throw err
     }
@@ -50,6 +60,7 @@ export const useCreations = () => {
       await creationService.deleteCreation(id)
       setCreations(prev => prev.filter(c => c.id !== id))
     } catch (err) {
+      console.error('Delete creation error:', err)
       setError(err.message)
       throw err
     }
@@ -60,6 +71,7 @@ export const useCreations = () => {
       const updatedCreation = await creationService.toggleFavorite(id)
       setCreations(prev => prev.map(c => c.id === id ? updatedCreation : c))
     } catch (err) {
+      console.error('Toggle favorite error:', err)
       setError(err.message)
       throw err
     }

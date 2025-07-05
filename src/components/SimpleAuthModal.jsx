@@ -42,7 +42,15 @@ const SimpleAuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
         })
       }
       onClose()
+      // Reset form
+      setFormData({
+        email: '',
+        password: '',
+        full_name: '',
+        phone: ''
+      })
     } catch (err) {
+      console.error('Auth error:', err)
       setError(err.message || 'Παρουσιάστηκε σφάλμα')
     } finally {
       setLoading(false)

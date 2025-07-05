@@ -7,20 +7,25 @@ export const creationService = {
     const user = authService.getCurrentUser()
     if (!user) throw new Error('Authentication required')
 
-    const { data, error } = await supabase
-      .from('creations')
-      .insert([{
-        user_id: user.id,
-        title,
-        description,
-        html_content: htmlContent,
-        config_data: configData
-      }])
-      .select()
-      .single()
-    
-    if (error) throw error
-    return data
+    try {
+      const { data, error } = await supabase
+        .from('thalassa_events.creations')
+        .insert([{
+          user_id: user.id,
+          title,
+          description,
+          html_content: htmlContent,
+          config_data: configData
+        }])
+        .select()
+        .single()
+      
+      if (error) throw new Error('Save failed: ' + error.message)
+      return data
+    } catch (error) {
+      console.error('Save creation error:', error)
+      throw error
+    }
   },
 
   // Update creation
@@ -28,22 +33,27 @@ export const creationService = {
     const user = authService.getCurrentUser()
     if (!user) throw new Error('Authentication required')
 
-    const { data, error } = await supabase
-      .from('creations')
-      .update({
-        title,
-        description,
-        html_content: htmlContent,
-        config_data: configData,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .select()
-      .single()
-    
-    if (error) throw error
-    return data
+    try {
+      const { data, error } = await supabase
+        .from('thalassa_events.creations')
+        .update({
+          title,
+          description,
+          html_content: htmlContent,
+          config_data: configData,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single()
+      
+      if (error) throw new Error('Update failed: ' + error.message)
+      return data
+    } catch (error) {
+      console.error('Update creation error:', error)
+      throw error
+    }
   },
 
   // Get user creations
@@ -51,14 +61,19 @@ export const creationService = {
     const user = authService.getCurrentUser()
     if (!user) throw new Error('Authentication required')
 
-    const { data, error } = await supabase
-      .from('creations')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-    
-    if (error) throw error
-    return data
+    try {
+      const { data, error } = await supabase
+        .from('thalassa_events.creations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+      
+      if (error) throw new Error('Load failed: ' + error.message)
+      return data || []
+    } catch (error) {
+      console.error('Get user creations error:', error)
+      throw error
+    }
   },
 
   // Delete creation
@@ -66,14 +81,19 @@ export const creationService = {
     const user = authService.getCurrentUser()
     if (!user) throw new Error('Authentication required')
 
-    const { error } = await supabase
-      .from('creations')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', user.id)
-    
-    if (error) throw error
-    return true
+    try {
+      const { error } = await supabase
+        .from('thalassa_events.creations')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id)
+      
+      if (error) throw new Error('Delete failed: ' + error.message)
+      return true
+    } catch (error) {
+      console.error('Delete creation error:', error)
+      throw error
+    }
   },
 
   // Toggle favorite
@@ -81,25 +101,32 @@ export const creationService = {
     const user = authService.getCurrentUser()
     if (!user) throw new Error('Authentication required')
 
-    // Get current favorite status
-    const { data: creation } = await supabase
-      .from('creations')
-      .select('is_favorite')
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .single()
+    try {
+      // Get current favorite status
+      const { data: creation, error: getError } = await supabase
+        .from('thalassa_events.creations')
+        .select('is_favorite')
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .single()
 
-    const { data, error } = await supabase
-      .from('creations')
-      .update({
-        is_favorite: !creation.is_favorite
-      })
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .select()
-      .single()
-    
-    if (error) throw error
-    return data
+      if (getError) throw new Error('Get favorite status failed: ' + getError.message)
+
+      const { data, error } = await supabase
+        .from('thalassa_events.creations')
+        .update({
+          is_favorite: !creation.is_favorite
+        })
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .select()
+        .single()
+      
+      if (error) throw new Error('Toggle favorite failed: ' + error.message)
+      return data
+    } catch (error) {
+      console.error('Toggle favorite error:', error)
+      throw error
+    }
   }
 }

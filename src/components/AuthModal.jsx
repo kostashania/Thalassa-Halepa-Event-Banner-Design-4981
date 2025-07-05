@@ -5,12 +5,12 @@ import { useAuth } from '../hooks/useAuth'
 
 const { FiX, FiEye, FiEyeOff, FiUser, FiMail, FiLock, FiPhone } = FiIcons
 
-const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
+const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
   const [mode, setMode] = useState(initialMode)
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const { signIn, signUp } = useAuth()
+  const { login, register } = useAuth()
 
   const [formData, setFormData] = useState({
     email: '',
@@ -33,15 +33,21 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
     setError('')
 
     try {
-      if (mode === 'signin') {
-        await signIn(formData.email, formData.password)
+      if (mode === 'login') {
+        await login(formData.email, formData.password)
       } else {
-        await signUp(formData.email, formData.password, {
+        await register(formData.email, formData.password, {
           full_name: formData.full_name,
           phone: formData.phone
         })
       }
       onClose()
+      setFormData({
+        email: '',
+        password: '',
+        full_name: '',
+        phone: ''
+      })
     } catch (err) {
       setError(err.message || 'Παρουσιάστηκε σφάλμα')
     } finally {
@@ -54,10 +60,9 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-bold text-gray-900">
-            {mode === 'signin' ? 'Σύνδεση' : 'Εγγραφή'}
+            {mode === 'login' ? 'Σύνδεση' : 'Εγγραφή'}
           </h2>
           <button
             onClick={onClose}
@@ -67,7 +72,6 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
@@ -75,7 +79,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
             </div>
           )}
 
-          {mode === 'signup' && (
+          {mode === 'register' && (
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -90,7 +94,6 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
                     onChange={handleInputChange}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Εισάγετε το όνομά σας"
-                    required
                   />
                 </div>
               </div>
@@ -146,7 +149,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
                 className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Εισάγετε τον κωδικό σας"
                 required
-                minLength={6}
+                minLength={3}
               />
               <button
                 type="button"
@@ -163,19 +166,18 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {loading ? 'Παρακαλώ περιμένετε...' : mode === 'signin' ? 'Σύνδεση' : 'Εγγραφή'}
+            {loading ? 'Παρακαλώ περιμένετε...' : mode === 'login' ? 'Σύνδεση' : 'Εγγραφή'}
           </button>
         </form>
 
-        {/* Footer */}
         <div className="px-6 pb-6 text-center">
           <p className="text-gray-600">
-            {mode === 'signin' ? 'Δεν έχετε λογαριασμό; ' : 'Έχετε ήδη λογαριασμό; '}
+            {mode === 'login' ? 'Δεν έχετε λογαριασμό; ' : 'Έχετε ήδη λογαριασμό; '}
             <button
-              onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+              onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
               className="text-blue-600 hover:text-blue-700 font-semibold"
             >
-              {mode === 'signin' ? 'Εγγραφή' : 'Σύνδεση'}
+              {mode === 'login' ? 'Εγγραφή' : 'Σύνδεση'}
             </button>
           </p>
         </div>

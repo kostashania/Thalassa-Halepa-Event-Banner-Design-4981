@@ -6,9 +6,14 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const currentUser = authService.getCurrentUser()
-    setUser(currentUser)
-    setLoading(false)
+    try {
+      const currentUser = authService.getCurrentUser()
+      setUser(currentUser)
+    } catch (error) {
+      console.error('Auth initialization error:', error)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   const login = async (email, password) => {
@@ -24,8 +29,12 @@ export const useAuth = () => {
   }
 
   const logout = () => {
-    authService.logout()
-    setUser(null)
+    try {
+      authService.logout()
+      setUser(null)
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
   }
 
   return {

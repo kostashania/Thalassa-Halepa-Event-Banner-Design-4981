@@ -1,77 +1,67 @@
-import { supabase } from '../lib/supabase'
-import bcrypt from 'bcryptjs'
-
+// Simple localStorage-based authentication service
 export const authService = {
-  // Simple login without email verification
+  // Simple login without verification
   async login(email, password) {
-    const { data: users, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .limit(1)
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 500))
     
-    if (error) throw error
+    // Get users from localStorage
+    const users = JSON.parse(localStorage.getItem('thalassa_users') || '[]')
+    const user = users.find(u => u.email === email && u.password === password)
     
-    if (users.length === 0) {
-      throw new Error('User not found')
+    if (!user) {
+      throw new Error('Invalid email or password')
     }
     
-    const user = users[0]
-    
-    // For demo purposes, we'll skip password hashing
-    // In production, use bcrypt.compare(password, user.password_hash)
-    if (password !== user.password_hash) {
-      throw new Error('Invalid password')
-    }
-    
-    // Store user session locally
-    localStorage.setItem('thalassa_user', JSON.stringify(user))
+    // Store current user session
+    localStorage.setItem('thalassa_current_user', JSON.stringify(user))
     
     return user
   },
 
   // Simple registration
   async register(email, password, userData = {}) {
-    // Check if user already exists
-    const { data: existingUsers } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', email)
-      .limit(1)
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 500))
     
-    if (existingUsers && existingUsers.length > 0) {
+    // Get existing users
+    const users = JSON.parse(localStorage.getItem('thalassa_users') || '[]')
+    
+    // Check if user already exists
+    if (users.find(u => u.email === email)) {
       throw new Error('User already exists')
     }
     
-    // For demo purposes, we'll store password as plain text
-    // In production, use bcrypt.hash(password, 10)
-    const { data, error } = await supabase
-      .from('users')
-      .insert([{
-        email,
-        password_hash: password, // In production: await bcrypt.hash(password, 10)
-        full_name: userData.full_name || '',
-        phone: userData.phone || ''
-      }])
-      .select()
-      .single()
+    // Create new user
+    const newUser = {
+      id: Date.now().toString(),
+      email,
+      password,
+      full_name: userData.full_name || '',
+      phone: userData.phone || '',
+      created_at: new Date().toISOString()
+    }
     
-    if (error) throw error
+    // Save to localStorage
+    users.push(newUser)
+    localStorage.setItem('thalassa_users', JSON.stringify(users))
+    localStorage.setItem('thalassa_current_user', JSON.stringify(newUser))
     
-    // Store user session locally
-    localStorage.setItem('thalassa_user', JSON.stringify(data))
-    
-    return data
+    return newUser
   },
 
-  // Get current user from localStorage
+  // Get current user
   getCurrentUser() {
-    const userStr = localStorage.getItem('thalassa_user')
-    return userStr ? JSON.parse(userStr) : null
+    try {
+      const userStr = localStorage.getItem('thalassa_current_user')
+      return userStr ? JSON.parse(userStr) : null
+    } catch (error) {
+      return null
+    }
   },
 
   // Logout
   logout() {
-    localStorage.removeItem('thalassa_user')
+    localStorage.removeItem('thalassa_current_user')
   }
 }
